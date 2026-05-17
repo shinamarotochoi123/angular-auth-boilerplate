@@ -1,0 +1,8 @@
+<div *ngIf="alerts.length" class="container">
+  <div class="m-3">
+    <div *ngFor="let alert of alerts" class="alert alert-dismissible" [class.alert-success]="alert.type === 0" [class.alert-danger]="alert.type === 1" [class.alert-info]="alert.type === 2" [class.alert-warning]="alert.type === 3">
+      <span [innerHTML]="alert.message"></span>
+      <button class="btn-close" (click)="removeAlert(alert)"></button>
+    </div>
+  </div>
+</div>
