@@ -1,0 +1,9 @@
+{
+  "buildCommand": "ng build --configuration production",
+  "outputDirectory": "dist/angular-auth-boilerplate",
+  "installCommand": "npm install",
+  "framework": "angular",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
