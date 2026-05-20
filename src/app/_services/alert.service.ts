@@ -1,64 +1,95 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-export class Alert {
+import { environment } from '../../environments/environment';
+
+export class Account {
   id?: string;
-  type?: number;
-  message?: string;
-  autoClose?: boolean;
-  keepAfterRouteChange?: boolean;
-
-  constructor(init?: Partial<Alert>) {
-    Object.assign(this, init);
-  }
-}
-
-export enum AlertType {
-  Success,
-  Error,
-  Info,
-  Warning
-}
-
-export class AlertOptions {
-  id?: string;
-  autoClose?: boolean;
-  keepAfterRouteChange?: boolean;
+  title?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: string;
+  jwtToken?: string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class AlertService {
-  private subject = new Subject<Alert>();
-  private defaultId = 'default-alert';
+export class AccountService {
+  private accountSubject: BehaviorSubject<Account | null>;
+  public account: Observable<Account | null>;
 
-  onAlert(id = this.defaultId): Observable<Alert> {
-    return this.subject.asObservable().pipe(filter(x => x && x.id === id));
+  constructor(
+    private router: Router,
+    private http: HttpClient
+  ) {
+    this.accountSubject = new BehaviorSubject<Account | null>(null);
+    this.account = this.accountSubject.asObservable();
   }
 
-  success(message: string, options?: AlertOptions): void {
-    this.alert(new Alert({ ...options, type: AlertType.Success, message }));
+  public get accountValue() {
+    return this.accountSubject.value;
   }
 
-  error(message: string, options?: AlertOptions): void {
-    this.alert(new Alert({ ...options, type: AlertType.Error, message }));
+  login(email: string, password: string) {
+    return this.http.post<any>(`${environment.apiUrl}/accounts/authenticate`, { email, password }, { withCredentials: true })
+      .pipe(map(account => {
+        this.accountSubject.next(account);
+        return account;
+      }));
   }
 
-  info(message: string, options?: AlertOptions): void {
-    this.alert(new Alert({ ...options, type: AlertType.Info, message }));
+  logout() {
+    this.accountSubject.next(null);
+    this.router.navigate(['/account/login']);
   }
 
-  warn(message: string, options?: AlertOptions): void {
-    this.alert(new Alert({ ...options, type: AlertType.Warning, message }));
+  register(account: any) {
+    return this.http.post(`${environment.apiUrl}/accounts/register`, account);
   }
 
-  alert(alert: Alert): void {
-    alert.id = alert.id || this.defaultId;
-    alert.autoClose = (alert.autoClose === undefined ? true : alert.autoClose);
-    this.subject.next(alert);
+  verifyEmail(token: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/verify-email`, { token });
   }
 
-  clear(id = this.defaultId): void {
-    this.subject.next(new Alert({ id }));
+  forgotPassword(email: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/forgot-password`, { email });
+  }
+
+  validateResetToken(token: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/validate-reset-token`, { token });
+  }
+
+  resetPassword(token: string, password: string, confirmPassword: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/reset-password`, { token, password, confirmPassword });
+  }
+
+  getAll() {
+    return this.http.get<Account[]>(`${environment.apiUrl}/accounts`);
+  }
+
+  getById(id: string) {
+    return this.http.get<Account>(`${environment.apiUrl}/accounts/${id}`);
+  }
+
+  create(params: any) {
+    return this.http.post(`${environment.apiUrl}/accounts`, params);
+  }
+
+  update(id: string, params: any) {
+    return this.http.put(`${environment.apiUrl}/accounts/${id}`, params)
+      .pipe(map((account: any) => {
+        if (account.id == this.accountValue?.id) {
+          account = { ...this.accountValue, ...account };
+          this.accountSubject.next(account);
+        }
+        return account;
+      }));
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${environment.apiUrl}/accounts/${id}`);
   }
 }

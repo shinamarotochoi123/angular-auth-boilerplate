@@ -27,7 +27,6 @@ import { fakeBackendProvider } from './_helpers/fake-backend';
     AuthGuard,
     AccountService,
     AlertService,
-    fakeBackendProvider
   ],
   bootstrap: [AppComponent]
 })
