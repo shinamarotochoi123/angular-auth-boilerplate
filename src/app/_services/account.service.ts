@@ -3,9 +3,11 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export class Account {
   id?: string;
+  title?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -31,7 +33,7 @@ export class AccountService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<any>(`/accounts/authenticate`, { email, password })
+    return this.http.post<any>(`${environment.apiUrl}/accounts/authenticate`, { email, password })
       .pipe(map(account => {
         this.accountSubject.next(account);
         return account;
@@ -43,7 +45,50 @@ export class AccountService {
     this.router.navigate(['/account/login']);
   }
 
-  register(account: Account) {
-    return this.http.post(`/accounts/register`, account);
+  register(account: any) {
+    return this.http.post(`${environment.apiUrl}/accounts/register`, account);
+  }
+
+  verifyEmail(token: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/verify-email`, { token });
+  }
+
+  forgotPassword(email: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/forgot-password`, { email });
+  }
+
+  validateResetToken(token: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/validate-reset-token`, { token });
+  }
+
+  resetPassword(token: string, password: string, confirmPassword: string) {
+    return this.http.post(`${environment.apiUrl}/accounts/reset-password`, { token, password, confirmPassword });
+  }
+
+  getAll() {
+    return this.http.get<Account[]>(`${environment.apiUrl}/accounts`);
+  }
+
+  getById(id: string) {
+    return this.http.get<Account>(`${environment.apiUrl}/accounts/${id}`);
+  }
+
+  create(params: any) {
+    return this.http.post(`${environment.apiUrl}/accounts`, params);
+  }
+
+  update(id: string, params: any) {
+    return this.http.put(`${environment.apiUrl}/accounts/${id}`, params)
+      .pipe(map((account: any) => {
+        if (account.id == this.accountValue?.id) {
+          account = { ...this.accountValue, ...account };
+          this.accountSubject.next(account);
+        }
+        return account;
+      }));
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${environment.apiUrl}/accounts/${id}`);
   }
 }
