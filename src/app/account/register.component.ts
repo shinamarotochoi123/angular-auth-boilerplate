@@ -45,8 +45,7 @@ export class RegisterComponent implements OnInit {
     if (this.form.invalid) return;
 
     this.submitting = true;
-    
-    // Format the data to match backend expectations
+
     const registrationData = {
       title: this.f['title'].value,
       firstName: this.f['firstName'].value,
@@ -60,18 +59,16 @@ export class RegisterComponent implements OnInit {
     this.accountService.register(registrationData)
       .subscribe({
         next: (response: any) => {
-          const message = response.message || 'Registration successful, please check your email for verification instructions';
+          const message = response.message || 'Registration successful! Please check your email for verification.';
           this.alertService.success(message, { keepAfterRouteChange: true });
           this.router.navigate(['../login'], { relativeTo: this.route });
         },
         error: (error: any) => {
-          let errorMessage = 'Registration failed';
-          if (typeof error === 'string') {
-            errorMessage = error;
-          } else if (error.error?.message) {
+          let errorMessage = 'Registration failed. Please try again.';
+          if (error.error?.message) {
             errorMessage = error.error.message;
-          } else if (error.message) {
-            errorMessage = error.message;
+          } else if (typeof error === 'string') {
+            errorMessage = error;
           }
           this.alertService.error(errorMessage);
           this.submitting = false;

@@ -51,7 +51,10 @@
       <div *ngIf="submitted && f['acceptTerms'].errors" class="invalid-feedback">Accept Terms is required</div>
     </div>
     <div class="mb-3">
-      <button [disabled]="submitting" class="btn btn-primary">Register</button>
+      <button [disabled]="submitting" class="btn btn-primary">
+        <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+        Register
+      </button>
       <a routerLink="../login" class="btn btn-link">Cancel</a>
     </div>
   </form>
