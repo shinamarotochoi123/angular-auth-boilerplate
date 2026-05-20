@@ -1,68 +1,34 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-<<<<<<< HEAD
-=======
-  "cli": {
-    "packageManager": "npm"
-  },
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
   "newProjectRoot": "projects",
   "projects": {
     "angular-auth-boilerplate": {
       "projectType": "application",
-<<<<<<< HEAD
-      "schematics": {},
-=======
       "schematics": {
         "@schematics/angular:component": {
-          "standalone": false
-        },
-        "@schematics/angular:directive": {
-          "standalone": false
-        },
-        "@schematics/angular:pipe": {
+          "style": "css",
           "standalone": false
         }
       },
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
         "build": {
-<<<<<<< HEAD
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/angular-auth-boilerplate",
             "index": "src/index.html",
-            "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-=======
-          "builder": "@angular/build:application",
-          "options": {
-            "browser": "src/main.ts",
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
+            "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+            "polyfills": ["zone.js"],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
-<<<<<<< HEAD
-                "node_modules/bootstrap/dist/css/bootstrap.min.css",
-
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "scripts": []
-=======
-              "src/styles.css"
-            ]
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
           },
           "configurations": {
             "production": {
@@ -74,31 +40,25 @@
                 },
                 {
                   "type": "anyComponentStyle",
-<<<<<<< HEAD
                   "maximumWarning": "2kB",
                   "maximumError": "4kB"
-=======
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
                 }
               ],
               "outputHashing": "all"
             },
             "development": {
+              "buildOptimizer": false,
               "optimization": false,
+              "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-<<<<<<< HEAD
           "builder": "@angular-devkit/build-angular:dev-server",
-=======
-          "builder": "@angular/build:dev-server",
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
           "configurations": {
             "production": {
               "buildTarget": "angular-auth-boilerplate:build:production"
@@ -109,33 +69,21 @@
           },
           "defaultConfiguration": "development"
         },
-<<<<<<< HEAD
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "scripts": []
           }
-=======
-        "test": {
-          "builder": "@angular/build:unit-test"
->>>>>>> fe43366e5d7dea55629455c1572c933d76e23f52
         }
       }
     }
