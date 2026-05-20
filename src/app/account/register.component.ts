@@ -24,6 +24,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
+      title: ['Mr', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -44,14 +45,35 @@ export class RegisterComponent implements OnInit {
     if (this.form.invalid) return;
 
     this.submitting = true;
-    this.accountService.register(this.form.value)
+    
+    // Format the data to match backend expectations
+    const registrationData = {
+      title: this.f['title'].value,
+      firstName: this.f['firstName'].value,
+      lastName: this.f['lastName'].value,
+      email: this.f['email'].value,
+      password: this.f['password'].value,
+      confirmPassword: this.f['confirmPassword'].value,
+      acceptTerms: this.f['acceptTerms'].value
+    };
+
+    this.accountService.register(registrationData)
       .subscribe({
-        next: () => {
-          this.alertService.success('Registration successful', { keepAfterRouteChange: true });
+        next: (response: any) => {
+          const message = response.message || 'Registration successful, please check your email for verification instructions';
+          this.alertService.success(message, { keepAfterRouteChange: true });
           this.router.navigate(['../login'], { relativeTo: this.route });
         },
         error: (error: any) => {
-          this.alertService.error(error);
+          let errorMessage = 'Registration failed';
+          if (typeof error === 'string') {
+            errorMessage = error;
+          } else if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          this.alertService.error(errorMessage);
           this.submitting = false;
         }
       });
