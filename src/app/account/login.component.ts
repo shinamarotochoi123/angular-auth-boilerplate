@@ -10,7 +10,7 @@ import { AlertService } from '../_services/alert.service';
 })
 export class LoginComponent implements OnInit {
   form!: FormGroup;
-  submitting = false;
+  loading = false;
   submitted = false;
 
   constructor(
@@ -34,18 +34,21 @@ export class LoginComponent implements OnInit {
     this.submitted = true;
     this.alertService.clear();
 
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      return;
+    }
 
-    this.submitting = true;
+    this.loading = true;
     this.accountService.login(this.f['email'].value, this.f['password'].value)
       .subscribe({
         next: () => {
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
           this.router.navigateByUrl(returnUrl);
         },
-        error: (error: any) => {
-          this.alertService.error(error);
-          this.submitting = false;
+        error: (error) => {
+          const errorMsg = error.error?.message || error.message || 'Login failed';
+          this.alertService.error(errorMsg);
+          this.loading = false;
         }
       });
   }

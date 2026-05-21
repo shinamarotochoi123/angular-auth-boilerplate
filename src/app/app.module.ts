@@ -9,6 +9,7 @@ import { HomeComponent } from './home/home.component';
 import { AuthGuard } from './_helpers/auth.guard';
 import { AccountService } from './_services/account.service';
 import { AlertService } from './_services/alert.service';
+import { fakeBackendProvider } from './_helpers/fake-backend';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { AlertService } from './_services/alert.service';
   providers: [
     AuthGuard,
     AccountService,
-    AlertService
+    AlertService,
+    fakeBackendProvider
   ],
   bootstrap: [AppComponent]
 })

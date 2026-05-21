@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AccountService } from '../_services/account.service';
-import { AlertService } from '../_services/alert.service';
-import { MustMatch } from '../_helpers/must-match.validator';
+import { first } from 'rxjs/operators';
+
+import { AccountService, AlertService } from '../_services';
+import { MustMatch } from '../_helpers';
 
 @Component({
   templateUrl: './register.component.html',
@@ -11,7 +12,7 @@ import { MustMatch } from '../_helpers/must-match.validator';
 })
 export class RegisterComponent implements OnInit {
   form!: FormGroup;
-  submitting = false;
+  submitting = false;  // ← Make sure this is 'submitting'
   submitted = false;
 
   constructor(
@@ -24,7 +25,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      title: ['Mr', Validators.required],
+      title: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -42,33 +43,24 @@ export class RegisterComponent implements OnInit {
     this.submitted = true;
     this.alertService.clear();
 
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      return;
+    }
 
     this.submitting = true;
-
-    const registrationData = {
-      title: this.f['title'].value,
-      firstName: this.f['firstName'].value,
-      lastName: this.f['lastName'].value,
-      email: this.f['email'].value,
-      password: this.f['password'].value,
-      confirmPassword: this.f['confirmPassword'].value,
-      acceptTerms: this.f['acceptTerms'].value
-    };
-
-    this.accountService.register(registrationData)
+    this.accountService.register(this.form.value)
+      .pipe(first())
       .subscribe({
-        next: (response: any) => {
-          const message = response.message || 'Registration successful! Please check your email for verification.';
-          this.alertService.success(message, { keepAfterRouteChange: true });
+        next: () => {
+          this.alertService.success('Registration successful, please check your email for verification instructions', { keepAfterRouteChange: true });
           this.router.navigate(['../login'], { relativeTo: this.route });
         },
         error: (error: any) => {
-          let errorMessage = 'Registration failed. Please try again.';
-          if (error.error?.message) {
+          let errorMessage = 'Registration failed';
+          if (error && error.message) {
+            errorMessage = error.message;
+          } else if (error && error.error && error.error.message) {
             errorMessage = error.error.message;
-          } else if (typeof error === 'string') {
-            errorMessage = error;
           }
           this.alertService.error(errorMessage);
           this.submitting = false;
